@@ -191,7 +191,7 @@ public class InAppBrowser extends CordovaPlugin {
                             }
                         }
                         // load in InAppBrowser
-                        else {
+                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
                             result = showWebPage(url, features);
                         }
@@ -957,11 +957,35 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
-            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") ||
+                    url.startsWith("nl-snsbank-ideal:") ||
+                    url.startsWith("nl-asnbank-ideal:") ||
+                    url.startsWith("nl.rabobank.ideal:") ||
+                    url.startsWith("nl-regiobank-ideal:") ||
+                    url.startsWith("triodosmobilebanking:") ||
+                    url.startsWith("bunq:") ||
+                    url.startsWith("moneyougonl:") ||
+                    url.startsWith("shb-nlpriv:")) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
+                    LOG.e(LOG_TAG, "intent " + intent);
                     cordova.getActivity().startActivity(intent);
+                    return true;
+                } catch (android.content.ActivityNotFoundException e) {
+                    LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+                }
+            } else if (url.startsWith("intent:")) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    try {
+                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                        LOG.e(LOG_TAG, "intent parseuri:" + intent);
+                        cordova.getActivity().startActivity(intent);
+                    } catch (java.net.URISyntaxException e) {
+                        LOG.e(LOG_TAG, "Error parse url " + url + ": " + e.toString());
+                    }
+//                    Intent existPackage = view.getContext().GetPackageManager().GetLaunchIntentForPackage(intent.getPackage());
                     return true;
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
@@ -1013,7 +1037,7 @@ public class InAppBrowser extends CordovaPlugin {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             String newloc = "";
-            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
+            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:") || url.startsWith("intent:")) {
                 newloc = url;
             }
             else
