@@ -959,11 +959,14 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
             } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") ||
-                    url.startsWith("nl-snsbank-ideal:") ||
+                    url.startsWith("nl.abnamro.ideal:") ||
                     url.startsWith("nl-asnbank-ideal:") ||
+                    url.startsWith("ideal-ing-nl:") ||
                     url.startsWith("nl.rabobank.ideal:") ||
+                    url.startsWith("nl-snsbank-ideal:") ||
                     url.startsWith("nl-regiobank-ideal:") ||
                     url.startsWith("triodosmobilebanking:") ||
+                    url.startsWith("knab-app:") ||
                     url.startsWith("bunq:") ||
                     url.startsWith("moneyougonl:") ||
                     url.startsWith("shb-nlpriv:")) {
