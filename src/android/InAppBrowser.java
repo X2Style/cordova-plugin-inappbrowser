@@ -971,6 +971,14 @@ public class InAppBrowser extends CordovaPlugin {
                     url.startsWith("moneyougonl:") ||
                     url.startsWith("shb-nlpriv:")) {
                 try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", LOAD_START_EVENT);
+                    obj.put("url", url);
+                    sendUpdate(obj, true);
+                } catch (JSONException ex) {
+                    LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+                }
+                try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
                     LOG.e(LOG_TAG, "intent " + intent);
