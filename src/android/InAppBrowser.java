@@ -981,6 +981,7 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
+                settings.setCacheMode(android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
                 // Add postMessage interface
                 class JsObject {
@@ -1256,12 +1257,47 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
-            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") ||
+                    url.startsWith("nl.abnamro.ideal:") ||
+                    url.startsWith("nl-asnbank-ideal:") ||
+                    url.startsWith("ideal-ing-nl:") ||
+                    url.startsWith("nl.rabobank.ideal:") ||
+                    url.startsWith("nl-snsbank-ideal:") ||
+                    url.startsWith("nl-regiobank-ideal:") ||
+                    url.startsWith("triodosmobilebanking:") ||
+                    url.startsWith("knab-app:") ||
+                    url.startsWith("bunq:") ||
+                    url.startsWith("moneyougonl:") ||
+                    url.startsWith("shb-nlpriv:")) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", LOAD_START_EVENT);
+                    obj.put("url", url);
+                    sendUpdate(obj, true);
+                } catch (JSONException ex) {
+                    LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+                }
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
+                    LOG.e(LOG_TAG, "intent " + intent);
                     cordova.getActivity().startActivity(intent);
-                    override = true;
+                    return true;
+                } catch (android.content.ActivityNotFoundException e) {
+                    LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+                }
+            } else if (url.startsWith("intent:")) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    try {
+                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                        LOG.e(LOG_TAG, "intent parseuri:" + intent);
+                        cordova.getActivity().startActivity(intent);
+                    } catch (java.net.URISyntaxException e) {
+                        LOG.e(LOG_TAG, "Error parse url " + url + ": " + e.toString());
+                    }
+//                    Intent existPackage = view.getContext().GetPackageManager().GetLaunchIntentForPackage(intent.getPackage());
+                    return true;
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
                 }
